@@ -281,26 +281,26 @@ class Snake:
 
 
 if __name__ == "__main__":
-    # env=Snake()
-    # while True:
-    #     env.reset()
-    #     for i in range(10):
-    #         env.mystep(env.sample_action())
-    #         env.myrender()
-    random.seed(100)
-    env = Snake()
-    env.snake_speed = 10
-    agent = AgentDiscretePPO()
-    agent.init(512, 6, 4)
-    agent.act.load_state_dict(torch.load('act_weight.pkl'))
-    for _ in range(15):
-        o = env.reset()
-        # for _ in range(500):
-        while 1:
-            env.render()
-            for event in pygame.event.get():  # 不加这句render要卡，不清楚原因
-                pass
-            a, _ = agent.select_action(o)
-            o2, r, d, _ = env.step(a)
-            o = o2
-            if d: break
+    env=Snake()
+    while True:
+        env.reset()
+        for i in range(10):
+            env.mystep(env.sample_action())
+            env.myrender()
+    # random.seed(100)
+    # env = Snake()
+    # env.snake_speed = 10
+    # agent = AgentDiscretePPO()
+    # agent.init(512, 6, 4)
+    # agent.act.load_state_dict(torch.load('act_weight.pkl'))
+    # for _ in range(15):
+    #     o = env.reset()
+    #     # for _ in range(500):
+    #     while 1:
+    #         env.render()
+    #         for event in pygame.event.get():  # 不加这句render要卡，不清楚原因
+    #             pass
+    #         a, _ = agent.select_action(o)
+    #         o2, r, d, _ = env.step(a)
+    #         o = o2
+    #         if d: break
