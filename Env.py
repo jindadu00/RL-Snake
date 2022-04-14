@@ -132,7 +132,7 @@ class Snake:
             else:
                 # 否则尾巴推近
                 tail_pos = self.body.pop()
-                current_map.map[tail_pos[0], tail_pos[1], self.id - 1] = 0
+                current_map.map[tail_pos[0], tail_pos[1], self.id - 1] -= 1
 
     def reduce_length(self, current_map):
         # TODO
