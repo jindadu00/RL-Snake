@@ -3,6 +3,7 @@ from pickle import FALSE
 import numpy as np
 
 
+# myinit
 class Cube:
 
     def __init__(self, coordinates, isHead=True):
