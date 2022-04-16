@@ -426,6 +426,25 @@ def genpos_normal(current_map):
         y = -center[1] - 1
     return [round(x) + center[0], round(y) + center[1]]
 
+def transferInput(input, speed, r, cc):
+    res = r
+    current_op_num = cc
+    for c in input:
+        if c == 'w' or c == 'a' or c == 's' or c == 'd':
+            res += c
+            current_op_num += 1
+            if current_op_num >= speed:
+                break
+    return [res, current_op_num]
+
+def handleInput(speed, snake_order):
+    res = ""
+    current_op_num = 0
+    while current_op_num < speed:
+        print("第" + str(snake_order) + "条蛇还需要" + str(speed - current_op_num) + "个操作，当前操作" + res)
+        [res, current_op_num] = transferInput(input("输入："), speed, res, current_op_num)
+    return res
+
 
 if __name__ == "__main__":
     current_map = Map()
@@ -438,6 +457,13 @@ if __name__ == "__main__":
 
         for snake in snake_list:
             snake.reduce_props()
+
+        actions = []
+        for index in range(6):
+            if not snake_list[index].isDead:
+                actions.append(handleInput(5, index + 1))
+                print("第" + str(index + 1) + "条蛇操作为：" + actions[index])
+
 
         for snake in snake_list:
             snake.move()
