@@ -1,6 +1,10 @@
 from ast import Pass
 from pickle import FALSE
 import numpy as np
+import pygame
+import sys
+from pygame.locals import *
+import time
 
 
 # myinit
@@ -21,14 +25,34 @@ class Map:
 
     def __init__(self):
         """
-        self.level: [0, 5], indicating snake 1, 2, 3, 4, 5, 6; 
+        self.level: [0, 5], indicating snake 1, 2, 3, 4, 5, 6;
                     [6, 9], indicating speed, strength, double star, star;
                     [10], indicating wall cell;
         """
+        self.wall_flag = FALSE
+        self.wall_refresh_times = 0
         self.row = 100
         self.column = 100
+        self.cell_size = 10
+        self.current_round = 1
         self.level = 11
         self.map = np.zeros([self.row, self.column, self.level])
+        self.color = [(255, 0, 0), (0, 0, 255), (0, 255, 0), (230, 230, 230),
+                      (40, 40, 40), (0, 0, 139), (160, 32, 240), (255, 165, 0),
+                      (0, 155, 0), (255, 215, 0), (0, 0, 0)]
+        # snk1color = (255, 0, 0) #red
+        # snk2color = (0, 0, 255) #blue
+        # snk3color = (0, 255, 0) #green
+        # snk4color = (230, 230, 230) #gray
+        # snk5color = (40, 40, 40) #darkgray
+        # snk6color = (0, 0, 139) #dark_blue
+
+        # speedcolor = (160, 32, 240) #purple
+        # strengthcolor = (255, 165, 0) #Orange1
+        # doublecolor = (0, 155, 0)#darkgreen
+        # starcolor = (255, 215, 0) #golden
+
+        # wallcolor = (0, 0, 0) #black
 
 
 class Snake:
@@ -41,7 +65,7 @@ class Snake:
         self.speedTime = 0
         self.doubleTime = 0
         self.toGrow = 0
-        self.id = id  #1~6蛇的编号
+        self.id = id  # 1~6蛇的编号
         self.score = 0
 
     def eat_star(self, num):
@@ -254,14 +278,14 @@ def detect_collision(current_map, snakes):
         hit_records[i, hh_idxs, 0] = 1
         hit_records[i, ht_idxs, 1] = 1
         hit_records[i, i, :] = 0
-    #TODO: suicide
+    # TODO: suicide
 
     # handle hit between snakes
     for idx_A in hit_records.shape[0]:
         for idx_B in hit_records.shape[1]:
             hh_hit, ht_hit = hit_records[idx_A,
-                                         idx_B, :][0], hit_records[idx_A,
-                                                                   idx_B, :][1]
+                             idx_B, :][0], hit_records[idx_A,
+                                           idx_B, :][1]
             if hh_hit == 0 and ht_hit == 0:
                 continue
             elif hh_hit == 0 and ht_hit == 1:
@@ -303,97 +327,128 @@ def sample_action():
     pass
 
 
-def render():
+def render(current_map):
+    BG_color = (255, 255, 255)  # white
+    pygame.init()
+    screen = pygame.display.set_mode(
+        (current_map.row * current_map.cell_size,
+         current_map.column * current_map.cell_size))
+    screen.fill(BG_color)
+    for i in range(11):
+        IDX_todraw = np.where(current_map.map[:, :, i] == 1)
+        x_todraw = IDX_todraw[0] * current_map.cell_size
+        y_todraw = IDX_todraw[1] * current_map.cell_size
+        for j in range(np.size(x_todraw)):
+            appleRect = pygame.Rect(x_todraw[j], y_todraw[j], current_map.cell_size,
+                                    current_map.cell_size)
+            pygame.draw.rect(screen, current_map.color[i], appleRect)
 
-    pass
+    pygame.display.update()
 
 
-def reset():
-    pass
+def reset(current_map, snake_list):
+    # clear snake, map and do initialization
+    # global current_map
+    # global snake_list
+    current_map.wall_flag = FALSE
+    current_map.wall_refresh_times = 0
+    current_map.map = np.zeros([current_map.row, current_map.column, current_map.level])
+
+    current_map.map[[0, current_map.row - 1], :, 10] = 1
+    current_map.map[:, [0, current_map.column - 1], 10] = 1
+
+    for snake_toclear in snake_list:
+        snake_toclear.isDead = False
+        snake_toclear.body = []  # 这是一个Cube的列表
+        snake_toclear.powerTime = 0
+        snake_toclear.speed = 1
+        snake_toclear.speedTime = 0
+        snake_toclear.doubleTime = 0
+        snake_toclear.toGrow = 0
+        snake_toclear.id = id  # 1~6蛇的编号
+        snake_toclear.score = 0
 
 
 # 刷新道具（随机按照正态分布）、地图缩圈
-def resource_refresh(snakes, current_map, current_round):
-    global wall_flag
-    if wall_flag == False:
+def resource_refresh(current_map):
+    if current_map.wall_flag == False:
         map_size = current_map.column * current_map.row
         empty_space = map_size - np.sum(current_map)
         if empty_space < 400:
-            wall_flag = True
-            #在第一次空区域小于400的时候，触发墙壁刷新停止机制
+            current_map.wall_flag = True
+            # 在第一次空区域小于400的时候，触发墙壁刷新停止机制
 
-    elif current_round < 100:
+    elif current_map.current_round < 100:
         pass
     else:
-        if current_round % 5 == 0:
-            wall_refresh(current_map, current_round)
-
+        if current_map.current_round % 5 == 0:
+            wall_refresh(current_map, current_map.current_round)
         else:
             pass
 
-    #刷新星星
-    N_star = 200 + current_round
-    R_star = 100 + min(current_round * 10, 200)
-    N_curstar = current_map[:, :, 9].sum()
+    # 刷新星星
+    N_star = 200 + current_map.current_round
+    R_star = 100 + min(current_map.current_round * 10, 200)
+    N_curstar = current_map.map[:, :, 9].sum()
     for i in range(R_star):
         if N_curstar >= N_star:
             break
         else:
-            [newstar_posx, newstar_posy] = genpos_normal()  #返回服从正态分布的坐标
+            [newstar_posx, newstar_posy] = genpos_normal(current_map)  # 返回服从正态分布的坐标
 
-            if 1 in current_map[newstar_posx, newstar_posy, :]:
+            if 1 in current_map.map[newstar_posx, newstar_posy, :]:
                 continue
             else:
-                current_map[newstar_posx, newstar_posy, 9] = 1
+                current_map.map[newstar_posx, newstar_posy, 9] = 1
                 N_curstar += 1
-    #刷新速度、力量、双倍道具
-    if current_round == 1:
+    # 刷新速度、力量、双倍道具
+    if current_map.current_round == 1:
         N_props = [50, 50, 50]
     else:
-        N_props = [60 + int(current_round * 0.2), 40, 50]
+        N_props = [60 + int(current_map.current_round * 0.2), 40, 50]
 
-    R_props = 10 + min(current_round * 10, 100)
-    #速度
-    N_curspeed = current_map[:, :, 6].sum()
+    R_props = 10 + min(current_map.current_round * 10, 100)
+    # 速度
+    N_curspeed = current_map.map[:, :, 6].sum()
     for i in range(R_props):
         if N_curspeed >= N_props[0]:
             break
         else:
-            [newspeed_posx, newspeed_posy] = genpos_normal()
-            if 1 in current_map[newspeed_posx, newspeed_posy, :]:
+            [newspeed_posx, newspeed_posy] = genpos_normal(current_map)
+            if 1 in current_map.map[newspeed_posx, newspeed_posy, :]:
                 continue
             else:
-                current_map[newspeed_posx, newspeed_posy, 6] = 1
+                current_map.map[newspeed_posx, newspeed_posy, 6] = 1
                 N_curspeed += 1
-    #力量
-    N_curstrength = current_map[:, :, 7].sum()
+    # 力量
+    N_curstrength = current_map.map[:, :, 7].sum()
     for i in range(R_props):
         if N_curstrength >= N_props[1]:
             break
         else:
-            [newstrength_posx, newstrength_posy] = genpos_normal()
-            if 1 in current_map[newstrength_posx, newstrength_posy, :]:
+            [newstrength_posx, newstrength_posy] = genpos_normal(current_map)
+            if 1 in current_map.map[newstrength_posx, newstrength_posy, :]:
                 continue
             else:
-                current_map[newstrength_posx, newstrength_posy, 7] = 1
+                current_map.map[newstrength_posx, newstrength_posy, 7] = 1
                 N_curstrength += 1
 
-    #双倍
-    N_curdouble = current_map[:, :, 8].sum()
+    # 双倍
+    N_curdouble = current_map.map[:, :, 8].sum()
     for i in range(R_props):
         if N_curdouble >= N_props[2]:
             break
         else:
-            [newdouble_posx, newdouble_posy] = genpos_normal()
-            if 1 in current_map[newdouble_posx, newdouble_posy, :]:
+            [newdouble_posx, newdouble_posy] = genpos_normal(current_map)
+            if 1 in current_map.map[newdouble_posx, newdouble_posy, :]:
                 continue
             else:
-                current_map[newdouble_posx, newdouble_posy, 8] = 1
+                current_map.map[newdouble_posx, newdouble_posy, 8] = 1
                 N_curdouble += 1
 
 
 def wall_refresh(current_map, current_round):
-    global wall_refresh_times
+    wall_refresh_times = current_map.wall_refresh_times
     toupdatewall_index = np.where(current_map.sum(axis=3) == 0)
 
     for i in range(np.size(toupdatewall_index[0])):
@@ -408,7 +463,7 @@ def wall_refresh(current_map, current_round):
                         10] = 1
         else:
             continue
-    wall_refresh_times += 1
+    current_map.wall_refresh_times += 1
 
 
 def genpos_normal(current_map):
@@ -424,7 +479,8 @@ def genpos_normal(current_map):
         y = -center[1]
     elif y >= center[1] - 1:
         y = -center[1] - 1
-    return [round(x) + center[0], round(y) + center[1]]
+    return [round(x[0] + center[0]), round(y[0] + center[1])]
+
 
 def transferInput(input, speed, r, cc):
     res = r
@@ -449,32 +505,34 @@ def handleInput(speed, snake_order):
 if __name__ == "__main__":
     current_map = Map()
     snake_list = [Snake(1), Snake(2), Snake(3), Snake(4), Snake(5), Snake(6)]
-    wall_flag = FALSE
-    wall_refresh_times = 0
 
+    # while True:
+    #     reset(current_map, snake_list)
+    # for snake in snake_list:
+    #     snake.reduce_props()
+
+    actions = []
+    for index in range(6):
+        if not snake_list[index].isDead:
+            actions.append(handleInput(5, index + 1))
+            print("第" + str(index + 1) + "条蛇操作为：" + actions[index])
+
+    # for snake in snake_list:
+    #     snake.move("w")
+
+    # detect_collision()
+
+    # for snake in snake_list:
+    #     snake.reduce_length()
+
+    # get_props()
+
+    # resource_refresh(current_map)
+    # render(current_map)
+
+    reset(current_map, snake_list)
+    # for i in range(10):
+    #     time.sleep(4)
+    #     resource_refresh(current_map)
     while True:
-        reset()
-
-        for snake in snake_list:
-            snake.reduce_props()
-
-        actions = []
-        for index in range(6):
-            if not snake_list[index].isDead:
-                actions.append(handleInput(5, index + 1))
-                print("第" + str(index + 1) + "条蛇操作为：" + actions[index])
-
-
-        for snake in snake_list:
-            snake.move()
-
-        detect_collision()
-
-        for snake in snake_list:
-            snake.reduce_length()
-
-        get_props()
-
-        resource_refresh()
-
-        render()
+        render(current_map)
