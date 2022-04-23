@@ -6,8 +6,8 @@ LastEditTime: 2022-04-16 21:04:10
 """
 import numpy as np
 
-MAP_ROW = 30
-MAP_COLUMN = 30
+MAP_ROW = 55
+MAP_COLUMN = 40
 LEVEL = 11
 
 
