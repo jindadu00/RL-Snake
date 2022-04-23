@@ -34,8 +34,8 @@ class Map:
         """
         self.wall_flag = FALSE
         self.wall_refresh_times = 0
-        self.row = 10
-        self.column = 10
+        self.row = 30
+        self.column = 30
         self.cell_size = 20
         self.current_round = 0
         self.level = 11
@@ -92,7 +92,8 @@ class Snake:
     # action是行动列表，比如"左,右,左"这种，就用['a', 'd', 'a']表示
     # 改current_map中自己的位置
     def move(self, action, current_map):
-        # TODO
+        if self.isDead:
+            return
         # 先把身体的每个部分都看作尾部
         for body in self.body:
             body.isHead = False
@@ -165,10 +166,6 @@ class Snake:
                 current_map.map[tail_pos.coordinates[0],
                                 tail_pos.coordinates[1], self.id - 1] -= 1
 
-    def reduce_length(self, current_map):
-        # TODO
-        pass
-
     def reduce_props(self):
         if self.doubleTime > 0:
             self.doubleTime -= 1
@@ -239,8 +236,10 @@ def active_killing(snake_A, snake_B, head_matrix, next_head_matrix):
         snake_A.isDead = True
     else:
         overlap_inds_xy = np.where(np.sum(head_matrix, axis=2) == 2)
-        if overlap_inds_xy[0].shape > 0:
-            next_head_matrix = next_head_matrix * 0
+        if overlap_inds_xy[0].shape[0] > 0:
+            # next_head_matrix = next_head_matrix * 0
+            return next_head_matrix * 0
+    return []
 
         # eye_mat = np.ones_like(next_head_matrix)
         # eye_mat[overlap_inds[0], overlap_inds[1], :] = 0
@@ -258,7 +257,7 @@ def update_body(snakes, snakes_matrix):
 
 def suicide(snakes, suicide_idxs, next_head_matrix):
     for i in suicide_idxs:
-        snakes[i].isDead = True & (snakes[i].powerTime > 0)
+        snakes[i].isDead = True & (snakes[i].powerTime <= 0)
         next_head_matrix[:, :, i] = 0
 
 
@@ -268,6 +267,9 @@ def detect_collision(current_map, snakes):
     input:
         current_map: np.array(W, H, L)
     """
+    for snake in snakes:
+        if snake.isDead:
+            current_map.map[:, :, snake.id - 1] = 0
     # init snakes_tail_matrix, head_matrix where snakes_matrix = tail_matrix + head_matrix
     snakes_matrix_origin = current_map.map[:, :,
                                            0:6]  # identicating self-hitting
@@ -303,7 +305,7 @@ def detect_collision(current_map, snakes):
     # sucide_records[suicide_idxs, suicide_idxs] = 1
 
     # handle suicide
-    suicide(snake_list, suicide_idxs, next_head_matrix)
+    suicide(snakes, suicide_idxs, next_head_matrix)
 
     # handle hit between snakes
     for idx_A in range(hit_records.shape[0]):
@@ -319,19 +321,23 @@ def detect_collision(current_map, snakes):
                                 next_head_matrix[:, :, [idx_A, idx_B]])
             elif hh_hit == 1 and ht_hit == 0:
                 # active killing
-                active_killing(snakes[idx_A], snakes[idx_B],
+                tmp = active_killing(snakes[idx_A], snakes[idx_B],
                                head_matrix[:, :, [idx_A, idx_B]],
                                next_head_matrix[:, :, [idx_A, idx_B]])
+                if not tmp == []:
+                    next_head_matrix[:, :, [idx_A, idx_B]] = tmp
             else:
-                active_killing(snakes[idx_A], snakes[idx_B],
+                tmp = active_killing(snakes[idx_A], snakes[idx_B],
                                head_matrix[:, :, [idx_A, idx_B]],
                                next_head_matrix[:, :, [idx_A, idx_B]])
+                if not tmp == []:
+                    next_head_matrix[:, :, [idx_A, idx_B]] = tmp
                 pass
 
     # handle hit between snake and wall
     wall = np.repeat(current_map.map[:, :, -1:], repeats=6, axis=2)
     hit_wall_idxs = np.unique(
-        np.where((wall == snakes_matrix) & (snakes_matrix == 1))[0])
+        np.where((snakes_matrix == wall) & (snakes_matrix == 1))[2])
     for snake_idx in hit_wall_idxs:
         snakes[snake_idx].isDead = True
 
@@ -459,15 +465,14 @@ def resource_refresh(current_map):
     #         wall_refresh(current_map, current_map.current_round)
     #     else:
     #         pass
-    N_star = 1
-    while current_map.map[:, :, 9].sum() < 1:
+    N_star = 3
+    while current_map.map[:, :, 9].sum() < N_star:
         [newstar_posx, newstar_posy] = genpos_normal(current_map)  #返回服从正态分布的坐标
         if 1 in current_map.map[newstar_posx, newstar_posy, :]:
             continue
         else:
             current_map.map[newstar_posx, newstar_posy, 9] = 1
             break
-
 
     #刷新星星
     # N_star = 200 + current_map.current_round
@@ -641,6 +646,9 @@ if __name__ == "__main__":
                 [10], indicating wall cell;
     """
     action = "assddddsswaaa"
+    for i in range(6):
+        snake_list[i].speed = 2
+        current_map.map[:, :, i] = 0
     for i in range(1, 6):
         snake_list[i].isDead = True
         current_map.map[:, :, i] = 0
@@ -649,11 +657,15 @@ if __name__ == "__main__":
     while True:
         resource_refresh(current_map)
         render(current_map)
-        time.sleep(0.05)
+        # time.sleep(1)
         # print(current_map.map[:, :, 0], '\n\n')
         for snake in snake_list:
-            ac = Policy(current_map.map, snake)
-            snake.move([ac], current_map)
+            if snake.isDead:
+                continue
+            for j in range(snake.speed):
+                ac = Policy(current_map.map, snake)
+                snake.move(ac, current_map)
+                print(ac)
         # print(current_map.map[:, :, 0], '\n\n')
         detect_collision(current_map, snake_list)
         isAllDead = True

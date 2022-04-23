@@ -6,9 +6,10 @@ LastEditTime: 2022-04-16 21:04:10
 """
 import numpy as np
 
-MAP_ROW = 10
-MAP_COLUMN = 10
+MAP_ROW = 30
+MAP_COLUMN = 30
 LEVEL = 11
+
 
 # 0空地、1道具、2不可走
 def transfer_map(current_map):
@@ -36,7 +37,8 @@ def longest_tail_path(map, snake_head, snake_tail):
         if can and tmp > longest:
             longest = tmp
             direction = [snake_head[0] - 1, snake_head[1]]
-    if snake_head[0] + 1 < MAP_ROW and map[snake_head[0] + 1][snake_head[1]] != 2:
+    if snake_head[0] + 1 < MAP_ROW and map[snake_head[0] +
+                                           1][snake_head[1]] != 2:
         can, tmp = tailBFS(map, [snake_head[0] + 1, snake_head[1]], snake_tail)
         if can and tmp > longest:
             longest = tmp
@@ -46,11 +48,14 @@ def longest_tail_path(map, snake_head, snake_tail):
         if can and tmp > longest:
             longest = tmp
             direction = [snake_head[0], snake_head[1] - 1]
-    if snake_head[1] + 1 < MAP_COLUMN and map[snake_head[0]][snake_head[1] + 1] != 2:
+    if snake_head[1] + 1 < MAP_COLUMN and map[snake_head[0]][snake_head[1] +
+                                                             1] != 2:
         can, tmp = tailBFS(map, [snake_head[0], snake_head[1] + 1], snake_tail)
         if can and tmp > longest:
             direction = [snake_head[0], snake_head[1] + 1]
     return direction
+
+
 # 模拟蛇去吃道具
 def explore(map, path, snake):
     explore_map = map.copy()
@@ -63,14 +68,18 @@ def explore(map, path, snake):
         for i in range(len(snake.body) + 1):
             explore_map[explore_path[i][0]][explore_path[i][1]] = 2
         for i in range(len(snake.body)):
-            explore_map[snake.body[i].coordinates[0]][snake.body[i].coordinates[1]] = 0
+            explore_map[snake.body[i].coordinates[0]][
+                snake.body[i].coordinates[1]] = 0
     else:
         new_tail = snake.body[len(snake.body) - len(explore_path)].coordinates
         for i in range(len(explore_path)):
             explore_map[explore_path[i][0]][explore_path[i][1]] = 2
-        for i in range(len(snake.body) - len(explore_path) + 1, len(snake.body)):
-            explore_map[snake.body[i].coordinates[0]][snake.body[i].coordinates[1]] = 0
+        for i in range(
+                len(snake.body) - len(explore_path) + 1, len(snake.body)):
+            explore_map[snake.body[i].coordinates[0]][
+                snake.body[i].coordinates[1]] = 0
     return tailBFS(explore_map, new_head, new_tail)
+
 
 def hash_xy(x, y):
     return x * 100 + y
@@ -101,19 +110,27 @@ def BFS(map, snake_head):
         current_position = queue.pop(0)
         # 把他的邻居加进来
         if current_position[0] - 1 >= 0:
-            end_position, flag = judge_neighbor(current_position[0] - 1, current_position[1], [current_position[0], current_position[1]])
+            end_position, flag = judge_neighbor(
+                current_position[0] - 1, current_position[1],
+                [current_position[0], current_position[1]])
         if flag == 1:
             break
         if current_position[0] + 1 < MAP_ROW:
-            end_position, flag = judge_neighbor(current_position[0] + 1, current_position[1], [current_position[0], current_position[1]])
+            end_position, flag = judge_neighbor(
+                current_position[0] + 1, current_position[1],
+                [current_position[0], current_position[1]])
         if flag == 1:
             break
         if current_position[1] - 1 >= 0:
-            end_position, flag = judge_neighbor(current_position[0], current_position[1] - 1, [current_position[0], current_position[1]])
+            end_position, flag = judge_neighbor(
+                current_position[0], current_position[1] - 1,
+                [current_position[0], current_position[1]])
         if flag == 1:
             break
         if current_position[1] + 1 < MAP_COLUMN:
-            end_position, flag = judge_neighbor(current_position[0], current_position[1] + 1, [current_position[0], current_position[1]])
+            end_position, flag = judge_neighbor(
+                current_position[0], current_position[1] + 1,
+                [current_position[0], current_position[1]])
         if flag == 1:
             break
     tmp = end_position
@@ -133,41 +150,52 @@ def tailBFS(map, snake_head, snake_tail):
     bfs_map = map.copy()
     queue = [snake_head]
     length = 0
+
     def judge_neighbor(current, dst):
         nonlocal queue
         if current[0] == dst[0] and current[1] == dst[1]:
             return True
-        if bfs_map[current[0]][current[1]] != -1 and bfs_map[current[0]][current[1]] != 2:
+        if bfs_map[current[0]][current[1]] != -1 and bfs_map[current[0]][
+                current[1]] != 2:
             queue.append(current)
             bfs_map[current[0]][current[1]] = -1
         return False
+
     while len(queue) > 0:
         current_position = queue.pop(0)
         if current_position[0] - 1 >= 0:
-            if judge_neighbor([current_position[0] - 1, current_position[1]], snake_tail):
+            if judge_neighbor([current_position[0] - 1, current_position[1]],
+                              snake_tail):
                 return [True, length]
         if current_position[0] + 1 < MAP_ROW:
-            if judge_neighbor([current_position[0] + 1, current_position[1]], snake_tail):
+            if judge_neighbor([current_position[0] + 1, current_position[1]],
+                              snake_tail):
                 return [True, length]
         if current_position[1] - 1 >= 0:
-            if judge_neighbor([current_position[0], current_position[1] - 1], snake_tail):
+            if judge_neighbor([current_position[0], current_position[1] - 1],
+                              snake_tail):
                 return [True, length]
         if current_position[1] + 1 < MAP_COLUMN:
-            if judge_neighbor([current_position[0], current_position[1] + 1], snake_tail):
+            if judge_neighbor([current_position[0], current_position[1] + 1],
+                              snake_tail):
                 return [True, length]
     return [False, 0]
+
 
 # 散步哈 TODO
 def wander(map, snake_head):
     if snake_head[0] - 1 >= 0 and map[snake_head[0] - 1][snake_head[1]] != 2:
         return 'w'
-    if snake_head[0] + 1 < MAP_ROW and map[snake_head[0] + 1][snake_head[1]] != 2:
+    if snake_head[0] + 1 < MAP_ROW and map[snake_head[0] +
+                                           1][snake_head[1]] != 2:
         return 's'
     if snake_head[1] - 1 >= 0 and map[snake_head[0]][snake_head[1] - 1] != 2:
         return 'a'
-    if snake_head[1] + 1 < MAP_COLUMN and map[snake_head[0]][snake_head[1] + 1] != 2:
+    if snake_head[1] + 1 < MAP_COLUMN and map[snake_head[0]][snake_head[1] +
+                                                             1] != 2:
         return 'd'
     return 'w'
+
 
 def get_operate(map, snake_head, path):
     if len(path) < 2:
@@ -188,6 +216,9 @@ def Policy(current_map, snake):
     map = transfer_map(current_map)
     snake_head = snake.body[0].coordinates
     snake_tail = snake.body[len(snake.body) - 1].coordinates
+    # 如果速度大于长度，则wander
+    if snake.speed > len(snake.body):
+        return wander(map, snake_head)
     # 在BFS过程中找到的第一个食物路径进行判断
     # map = [[0, 1, 0], [0, 2, 0], [0, 2, 0]]
     # snake_head = [2, 1]
