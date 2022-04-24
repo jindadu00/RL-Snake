@@ -28,9 +28,7 @@ def AI0(Num_, GameInfo_):
     # return my_policy(GameInfo_["gameinfo"])
     # #一个最简单的AI
     print(GameInfo_["gameinfo"]["Player"][Num_]["IsDead"])
-    if not GameInfo_["gameinfo"]["Player"][Num_]["IsDead"]:
-        return my_policy(GameInfo_["gameinfo"])
-    return "w"
+    my_policy(GameInfo_["gameinfo"], Num_)
     # #自身头部位置
     # PositionNow = GameInfo_["gameinfo"]["Map"]["SnakePosition"][Num_][0]
     # ActList = {"w": [0, 1], "s": [0, -1], "a": [-1, 0], "d": [1, 0]}

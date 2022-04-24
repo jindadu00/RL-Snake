@@ -34,9 +34,9 @@ class Map:
         """
         self.wall_flag = FALSE
         self.wall_refresh_times = 0
-        self.row = 30
-        self.column = 30
-        self.cell_size = 20
+        self.row = 40
+        self.column = 55
+        self.cell_size = 10
         self.current_round = 0
         self.level = 11
         self.map = np.zeros([self.row, self.column, self.level])
@@ -60,10 +60,11 @@ class Map:
 
 class Snake:
 
-    def __init__(self, id, init_body, current_map):
+    def __init__(self, id, init_body, current_map, is_convert = False):
         self.isDead = False
-        self.body = [Cube(init_body)]  # 这是一个Cube的列表
-        current_map.map[init_body[0], init_body[1], [id - 1]] = 1
+        if not is_convert:
+            self.body = [Cube(init_body)]  # 这是一个Cube的列表
+            current_map.map[init_body[0], init_body[1], [id - 1]] = 1
         self.powerTime = 0
         self.speed = 1
         self.speedTime = 0
@@ -395,8 +396,8 @@ def render(current_map):
     BG_color = (255, 255, 255)  #white
     pygame.init()
     screen = pygame.display.set_mode(
-        (current_map.row * current_map.cell_size,
-         current_map.column * current_map.cell_size))
+        (current_map.column * current_map.cell_size,
+         current_map.row * current_map.cell_size))
     screen.fill(BG_color)
     for i in range(11):
         IDX_todraw = np.where(current_map.map[:, :, i] == 1)

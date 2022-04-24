@@ -6,8 +6,8 @@ LastEditTime: 2022-04-16 21:04:10
 """
 import numpy as np
 
-MAP_ROW = 55
-MAP_COLUMN = 40
+MAP_ROW = 40
+MAP_COLUMN = 55
 LEVEL = 11
 
 
@@ -213,7 +213,13 @@ def get_operate(map, snake_head, path):
 
 # 这个函数只走一步，按照snake的speed数量进行多次调用
 def Policy(current_map, snake):
-    map = transfer_map(current_map)
+    global MAP_ROW
+    MAP_ROW = current_map.row
+    global MAP_COLUMN
+    MAP_COLUMN = current_map.column
+    global LEVEL
+    LEVEL = current_map.level
+    map = transfer_map(current_map.map)
     snake_head = snake.body[0].coordinates
     snake_tail = snake.body[len(snake.body) - 1].coordinates
     # 如果速度大于长度，则wander
