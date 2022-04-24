@@ -18,16 +18,4 @@ def my_policy(game_info, Num_):
         tmp = Policy(current_map, my_snake)
         actions += tmp
         my_snake.move(tmp, current_map)
-
-    converted_actions = ""
-    for i in range(len(actions)):
-        a = actions[i]
-        if a == 'w':
-            converted_actions += 'a'
-        if a == 'a':
-            converted_actions += 's'
-        if a == 's':
-            converted_actions += 'd'
-        if a == 'd':
-            converted_actions += 'w'
-    return converted_actions
+    return actions

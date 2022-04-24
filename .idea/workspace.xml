@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="aad483f7-9a83-42ac-ac84-e36786ba757b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Converter.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AStarPolicy.py" beforeDir="false" afterPath="$PROJECT_DIR$/AStarPolicy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Env.py" beforeDir="false" afterPath="$PROJECT_DIR$/Env.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Converter.py" beforeDir="false" afterPath="$PROJECT_DIR$/Converter.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GameInfoAdaptor.py" beforeDir="false" afterPath="$PROJECT_DIR$/GameInfoAdaptor.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Info.pickle" beforeDir="false" afterPath="$PROJECT_DIR$/Info.pickle" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client_example.py" beforeDir="false" afterPath="$PROJECT_DIR$/client_example.py" afterDir="false" />

@@ -220,6 +220,7 @@ def Policy(current_map, snake):
     global LEVEL
     LEVEL = current_map.level
     map = transfer_map(current_map.map)
+    print(map)
     snake_head = snake.body[0].coordinates
     snake_tail = snake.body[len(snake.body) - 1].coordinates
     # 如果速度大于长度，则wander
@@ -237,6 +238,7 @@ def Policy(current_map, snake):
             print("蛇可以去吃食物")
             if len(food_path) < 2:
                 return wander(map, snake_head)
+            print(get_operate(map, snake_head, food_path[1]))
             return get_operate(map, snake_head, food_path[1])
         else:
             longest_direction = longest_tail_path(map, snake_head, snake_tail)

@@ -1,11 +1,14 @@
 from Env import *
+
 level = 11
 length = 55
 width = 40
 
+
 def co_map(cor):
-    mapCor = [cor[1], width - cor[0]]
+    mapCor = [width - cor[1] - 1, cor[0]]
     return mapCor
+
 
 def MapConverter(game_info):
     my_map = Map()
@@ -23,7 +26,7 @@ def MapConverter(game_info):
     # 在地图上放道具
     for i in range(len(game_info["Map"]["PropPosition"])):
         prop_position = game_info["Map"]["PropPosition"]
-        for j in range(len(prop_position)):
+        for j in range(len(prop_position[i])):
             position = co_map(prop_position[i][j])
             my_map.map[position[0]][position[1]][i + 6] = 1
     # 在地图上放墙
@@ -31,6 +34,7 @@ def MapConverter(game_info):
         position = co_map(game_info["Map"]["WallPosition"][i])
         my_map.map[position[0]][position[1]][10] = 1
     return my_map
+
 
 def SnakeConverter(game_info):
     # 生成🐍
