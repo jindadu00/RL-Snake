@@ -9,13 +9,9 @@ width = 40
 
 def my_policy(game_info, Num_):
     current_map = MapConverter(game_info)
-    render(current_map)
-    actions = ""
+    # render(current_map)
     if game_info["Player"][Num_]["IsDead"]:
         return "w"
     my_snake = SnakeConverter(game_info)
-    for _ in range(my_snake.speed):
-        tmp = Policy(current_map, my_snake)
-        actions += tmp
-        my_snake.move(tmp, current_map)
+    actions = Policy(current_map, my_snake)
     return actions

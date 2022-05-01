@@ -392,14 +392,17 @@ def sample_action():
     pass
 
 
-def render(current_map):
+def render(current_map, snake):
     BG_color = (255, 255, 255)  #white
     pygame.init()
     screen = pygame.display.set_mode(
         (current_map.column * current_map.cell_size,
          current_map.row * current_map.cell_size))
     screen.fill(BG_color)
+    myfont = pygame.font.Font(None, 40)
+    textImage = myfont.render("speed:" + str(snake.speed), True, [255, 0, 0])
     for i in range(11):
+        screen.blit(textImage, (0, 200))
         IDX_todraw = np.where(current_map.map[:, :, i] == 1)
         x_todraw = IDX_todraw[0] * current_map.cell_size
         y_todraw = IDX_todraw[1] * current_map.cell_size
@@ -450,15 +453,10 @@ def reset(current_map, snake_list):
 
 # 刷新道具（随机按照正态分布）、地图缩圈
 def resource_refresh(current_map):
-    # if current_map.wall_flag == False:
-    #     map_size = current_map.column * current_map.row
-    #     empty_space = map_size - np.sum(current_map.map)
-    #     if empty_space < 400:
-    #         current_map.wall_flag = True
-    #         #在第一次空区域小于400的时候，触发墙壁刷新停止机制
-    #     elif current_map.current_round % 5 == 0:
-    #         wall_refresh(current_map, current_map.current_round)
-    #
+    map_size = current_map.column * current_map.row
+    empty_space = map_size - np.sum(current_map.map[:,:,[9,10]])
+    if current_map.current_round % 5 == 0:
+        wall_refresh(current_map, current_map.current_round)
     # elif current_map.current_round < 100:
     #     pass
     # else:
@@ -466,7 +464,7 @@ def resource_refresh(current_map):
     #         wall_refresh(current_map, current_map.current_round)
     #     else:
     #         pass
-    N_star = 3
+    N_star = 300
     while current_map.map[:, :, 9].sum() < N_star:
         [newstar_posx, newstar_posy] = genpos_normal(current_map)  #返回服从正态分布的坐标
         if 1 in current_map.map[newstar_posx, newstar_posy, :]:
@@ -475,72 +473,72 @@ def resource_refresh(current_map):
             current_map.map[newstar_posx, newstar_posy, 9] = 1
             break
 
-    #刷新星星
-    # N_star = 200 + current_map.current_round
-    # R_star = 100 + min(current_map.current_round * 10, 200)
-    # N_curstar = current_map.map[:, :, 9].sum()
-    # for i in range(R_star):
-    #     if N_curstar >= N_star:
-    #         break
-    #     else:
-    #         [newstar_posx,
-    #          newstar_posy] = genpos_normal(current_map)  #返回服从正态分布的坐标
-    #
-    #         if 1 in current_map.map[newstar_posx, newstar_posy, :]:
-    #             continue
-    #         else:
-    #             current_map.map[newstar_posx, newstar_posy, 9] = 1
-    #             N_curstar += 1
-    #刷新速度、力量、双倍道具
-    # if current_map.current_round == 1:
-    #     N_props = [50, 50, 50]
-    # else:
-    #     N_props = [60 + int(current_map.current_round * 0.2), 40, 50]
-    #
-    # R_props = 10 + min(current_map.current_round * 10, 100)
-    # #速度
-    # N_curspeed = current_map.map[:, :, 6].sum()
-    # for i in range(R_props):
-    #     if N_curspeed >= N_props[0]:
-    #         break
-    #     else:
-    #         [newspeed_posx, newspeed_posy] = genpos_normal(current_map)
-    #         if 1 in current_map.map[newspeed_posx, newspeed_posy, :]:
-    #             continue
-    #         else:
-    #             current_map.map[newspeed_posx, newspeed_posy, 6] = 1
-    #             N_curspeed += 1
-    # #力量
-    # N_curstrength = current_map.map[:, :, 7].sum()
-    # for i in range(R_props):
-    #     if N_curstrength >= N_props[1]:
-    #         break
-    #     else:
-    #         [newstrength_posx, newstrength_posy] = genpos_normal(current_map)
-    #         if 1 in current_map.map[newstrength_posx, newstrength_posy, :]:
-    #             continue
-    #         else:
-    #             current_map.map[newstrength_posx, newstrength_posy, 7] = 1
-    #             N_curstrength += 1
-    #
-    # #双倍
-    # N_curdouble = current_map.map[:, :, 8].sum()
-    # for i in range(R_props):
-    #     if N_curdouble >= N_props[2]:
-    #         break
-    #     else:
-    #         [newdouble_posx, newdouble_posy] = genpos_normal(current_map)
-    #         if 1 in current_map.map[newdouble_posx, newdouble_posy, :]:
-    #             continue
-    #         else:
-    #             current_map.map[newdouble_posx, newdouble_posy, 8] = 1
-    #             N_curdouble += 1
+    # 刷新星星
+    N_star = 200 + current_map.current_round
+    R_star = 100 + min(current_map.current_round * 10, 200)
+    N_curstar = current_map.map[:, :, 9].sum()
+    for i in range(R_star):
+        if N_curstar >= N_star:
+            break
+        else:
+            [newstar_posx,
+             newstar_posy] = genpos_normal(current_map)  #返回服从正态分布的坐标
+
+            if 1 in current_map.map[newstar_posx, newstar_posy, :]:
+                continue
+            else:
+                current_map.map[newstar_posx, newstar_posy, 9] = 1
+                N_curstar += 1
+    # 刷新速度、力量、双倍道具
+    if current_map.current_round == 1:
+        N_props = [50, 50, 50]
+    else:
+        N_props = [60 + int(current_map.current_round * 0.2), 40, 50]
+
+    R_props = 10 + min(current_map.current_round * 10, 100)
+    #速度
+    N_curspeed = current_map.map[:, :, 6].sum()
+    for i in range(R_props):
+        if N_curspeed >= N_props[0]:
+            break
+        else:
+            [newspeed_posx, newspeed_posy] = genpos_normal(current_map)
+            if 1 in current_map.map[newspeed_posx, newspeed_posy, :]:
+                continue
+            else:
+                current_map.map[newspeed_posx, newspeed_posy, 6] = 1
+                N_curspeed += 1
+    #力量
+    N_curstrength = current_map.map[:, :, 7].sum()
+    for i in range(R_props):
+        if N_curstrength >= N_props[1]:
+            break
+        else:
+            [newstrength_posx, newstrength_posy] = genpos_normal(current_map)
+            if 1 in current_map.map[newstrength_posx, newstrength_posy, :]:
+                continue
+            else:
+                current_map.map[newstrength_posx, newstrength_posy, 7] = 1
+                N_curstrength += 1
+
+    #双倍
+    N_curdouble = current_map.map[:, :, 8].sum()
+    for i in range(R_props):
+        if N_curdouble >= N_props[2]:
+            break
+        else:
+            [newdouble_posx, newdouble_posy] = genpos_normal(current_map)
+            if 1 in current_map.map[newdouble_posx, newdouble_posy, :]:
+                continue
+            else:
+                current_map.map[newdouble_posx, newdouble_posy, 8] = 1
+                N_curdouble += 1
 
 
 def wall_refresh(current_map, current_round):
     wall_refresh_times = current_map.wall_refresh_times
     toupdatewall_index = np.where(current_map.map.sum(axis=2) == 0)
-
+    print(toupdatewall_index)
     for i in range(np.size(toupdatewall_index[0])):
         rowflag = (toupdatewall_index[0][i] < wall_refresh_times) or (
             toupdatewall_index[0][i] >= current_map.row - wall_refresh_times)
@@ -558,7 +556,7 @@ def wall_refresh(current_map, current_round):
 
 
 def genpos_normal(current_map):
-    center = [current_map.column / 2, current_map.row / 2]
+    center = [current_map.row / 2, current_map.column / 2]
     x = np.random.normal(0, 10, 1)
     y = np.random.normal(0, 10, 1)
     if x < -center[0]:
@@ -647,26 +645,32 @@ if __name__ == "__main__":
                 [10], indicating wall cell;
     """
     action = "assddddsswaaa"
-    for i in range(6):
-        snake_list[i].speed = 2
-        current_map.map[:, :, i] = 0
+    # for i in range(6):
+    #     current_map.map[:, :, i] = 0
     for i in range(1, 6):
         snake_list[i].isDead = True
         current_map.map[:, :, i] = 0
     # current_map.map[[1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 6],
     #                 [1, 2, 3, 4, 5, 6, 6, 6, 6, 6, 6], 9] = 1
+    current_map.map = np.load("filename.npy", allow_pickle=True)
+    render(current_map, snake_list[0])
+    input()
     while True:
+        tmp = current_map.map.copy()
         resource_refresh(current_map)
-        render(current_map)
+        render(current_map, snake_list[0])
         # time.sleep(1)
         # print(current_map.map[:, :, 0], '\n\n')
         for snake in snake_list:
             if snake.isDead:
                 continue
-            for j in range(snake.speed):
-                ac = Policy(current_map.map, snake)
-                snake.move(ac, current_map)
-                print(ac)
+            # for j in range(snake.speed):
+            #     ac = Policy(current_map, snake)
+            #     snake.move(ac, current_map)
+            #     print(ac)
+            ac = Policy(current_map, snake)
+            snake.move(ac, current_map)
+        time.sleep(0.5)
         # print(current_map.map[:, :, 0], '\n\n')
         detect_collision(current_map, snake_list)
         isAllDead = True
@@ -674,8 +678,11 @@ if __name__ == "__main__":
             if not snake.isDead:
                 isAllDead = False
         if isAllDead:
+            np.save("filename.npy", tmp)
+            input()
             break
         get_props(current_map, snake_list)
+        round_over(current_map, snake_list)
         # print(current_map.map[:, :, 0], '\n\n')
         # resource_refresh(current_map)
         # time.sleep(0.1)

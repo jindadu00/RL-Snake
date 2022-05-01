@@ -4,10 +4,10 @@
     <list default="true" id="aad483f7-9a83-42ac-ac84-e36786ba757b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AStarPolicy.py" beforeDir="false" afterPath="$PROJECT_DIR$/AStarPolicy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Converter.py" beforeDir="false" afterPath="$PROJECT_DIR$/Converter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Env.py" beforeDir="false" afterPath="$PROJECT_DIR$/Env.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/GameInfoAdaptor.py" beforeDir="false" afterPath="$PROJECT_DIR$/GameInfoAdaptor.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Info.pickle" beforeDir="false" afterPath="$PROJECT_DIR$/Info.pickle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client_example.py" beforeDir="false" afterPath="$PROJECT_DIR$/client_example.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Test.py" beforeDir="false" afterPath="$PROJECT_DIR$/Test.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +45,7 @@
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
-  <component name="RunManager" selected="Python.client">
+  <component name="RunManager" selected="Python.ENV">
     <configuration name="测试用例1" type="PythonConfigurationType" factoryName="Python">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -161,6 +161,7 @@
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="user" value="徐珺涵" />
       </envs>
       <option name="SDK_HOME" value="D:\Python\Scripts\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
@@ -203,6 +204,7 @@
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="user" value="徐珺涵" />
       </envs>
       <option name="SDK_HOME" value="D:\Python\Scripts\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />

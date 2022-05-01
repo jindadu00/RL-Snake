@@ -9,6 +9,8 @@ from Env import resource_refresh
 from Env import get_props
 
 if __name__ == "__main__":
+    tmp = [1, 2, 3, 4, 5]
+    print(tmp.pop())
     mode = os.getenv("mode")
     current_map = Map()
     c = current_map.column

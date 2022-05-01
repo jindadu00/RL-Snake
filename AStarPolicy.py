@@ -5,11 +5,23 @@ LastEditor: TheJunhan
 LastEditTime: 2022-04-16 21:04:10
 """
 import numpy as np
+import os
 
 MAP_ROW = 40
 MAP_COLUMN = 55
 LEVEL = 11
 
+class Cube:
+
+    def __init__(self, coordinates, isHead=True):
+        self.coordinates = coordinates
+        # coordinates  -->  np.array([x,y])
+        # 屏幕左上角为[0,0],
+        # 右上角为[0,current_map.column-1],
+        # 左下角为[current_map.row-1,0],
+        # 右下角为[current_map.row-1,current_map.column-1],
+        # TODO
+        self.isHead = isHead
 
 # 0空地、1道具、2不可走
 def transfer_map(current_map):
@@ -24,34 +36,83 @@ def transfer_map(current_map):
                     if k in range(6, 10):
                         map[i][j] = 1
                     if k == 10:
+                        # 邻居也是墙
+                        if i - 1 >= 0:
+                            map[i - 1][j] = 2
+                        if i + 1 < MAP_ROW:
+                            map[i + 1][j] = 2
+                        if j - 1 >= 0:
+                            map[i][j - 1] = 2
+                        if j + 1 < MAP_COLUMN:
+                            map[i][j + 1] = 2
+                        # if i - 2 >= 0:
+                        #     map[i - 2][j] = 2
+                        # if i + 2 < MAP_ROW:
+                        #     map[i + 2][j] = 2
+                        # if j - 2 >= 0:
+                        #     map[i][j - 2] = 2
+                        # if j + 2 < MAP_COLUMN:
+                        #     map[i][j + 2] = 2
                         map[i][j] = 2
     return map
 
+dfs_level = 0
+arrive = False
+
+def tailDFS(map, current_position, dst, current_level):
+    global dfs_level
+    global arrive
+    p = current_position
+    if p[0] == dst[0] and p[1] == dst[1]:
+        arrive = True
+        return
+    my_map = map.copy()
+    my_map[p[0]][p[1]] = -1
+    if current_level > dfs_level:
+        dfs_level  = current_level
+    if p[0] - 1 >= 0 and (map[p[0] - 1][p[1]] == 0 or map[p[0] - 1][p[1]] == 1):
+        tailDFS(my_map, [p[0] - 1, p[1]], dst, current_level + 1)
+    if p[0] + 1 < MAP_ROW and (map[p[0] + 1][p[1]] == 0 or map[p[0] + 1][p[1]] == 1):
+        tailDFS(my_map, [p[0] + 1, p[1]], dst, current_level + 1)
+    if p[1] - 1 >= 0 and (map[p[0]][p[1] - 1] == 0 or map[p[0]][p[1] - 1] == 1):
+        tailDFS(my_map, [p[0], p[1] - 1], dst, current_level + 1)
+    if p[1] + 1 < MAP_COLUMN and (map[p[0]][p[1] + 1] == 0 or map[p[0]][p[1] + 1] == 1):
+        tailDFS(my_map, [p[0], p[1] + 1], dst, current_level + 1)
 
 # 找到到尾巴的最长路径
 def longest_tail_path(map, snake_head, snake_tail):
-    direction = []
+    my_map = map.copy()
+    my_map[snake_tail[0]][snake_tail[1]] = 0
     longest = 0
-    if snake_head[0] - 1 >= 0 and map[snake_head[0] - 1][snake_head[1]] != 2:
-        can, tmp = tailBFS(map, [snake_head[0] - 1, snake_head[1]], snake_tail)
-        if can and tmp > longest:
-            longest = tmp
+    direction = []
+    global dfs_level
+    global arrive
+    if snake_head[0] - 1 >= 0 and my_map[snake_head[0] - 1][snake_head[1]] != 2:
+        arrive = False
+        dfs_level = 0
+        tailDFS(my_map, [snake_head[0] - 1, snake_head[1]], snake_tail, 0)
+        if dfs_level > longest:
+            longest = dfs_level
             direction = [snake_head[0] - 1, snake_head[1]]
-    if snake_head[0] + 1 < MAP_ROW and map[snake_head[0] +
-                                           1][snake_head[1]] != 2:
-        can, tmp = tailBFS(map, [snake_head[0] + 1, snake_head[1]], snake_tail)
-        if can and tmp > longest:
-            longest = tmp
+    if snake_head[0] + 1 < MAP_ROW and my_map[snake_head[0] + 1][snake_head[1]] != 2:
+        arrive = False
+        dfs_level = 0
+        tailDFS(my_map, [snake_head[0] + 1, snake_head[1]], snake_tail, 0)
+        if dfs_level > longest:
+            longest = dfs_level
             direction = [snake_head[0] + 1, snake_head[1]]
-    if snake_head[1] - 1 >= 0 and map[snake_head[0]][snake_head[1] - 1] != 2:
-        can, tmp = tailBFS(map, [snake_head[0], snake_head[1] - 1], snake_tail)
-        if can and tmp > longest:
-            longest = tmp
+    if snake_head[1] - 1 >= 0 and my_map[snake_head[0]][snake_head[1] - 1] != 2:
+        arrive = False
+        dfs_level = 0
+        tailDFS(my_map, [snake_head[0], snake_head[1] - 1], snake_tail, 0)
+        if dfs_level > longest:
+            longest = dfs_level
             direction = [snake_head[0], snake_head[1] - 1]
-    if snake_head[1] + 1 < MAP_COLUMN and map[snake_head[0]][snake_head[1] +
-                                                             1] != 2:
-        can, tmp = tailBFS(map, [snake_head[0], snake_head[1] + 1], snake_tail)
-        if can and tmp > longest:
+    if snake_head[1] + 1 < MAP_COLUMN and my_map[snake_head[0]][snake_head[1] + 1] != 2:
+        arrive = False
+        dfs_level = 0
+        tailDFS(my_map, [snake_head[0], snake_head[1] + 1], snake_tail, 0)
+        if dfs_level > longest:
             direction = [snake_head[0], snake_head[1] + 1]
     return direction
 
@@ -95,13 +156,15 @@ def BFS(map, snake_head):
     bfs_map[snake_head[0]][snake_head[1]] = -1
     flag = 0
 
+    # def can_eat(x, y, last_position):
+
     def judge_neighbor(x, y, last_position):
         nonlocal jump_history
-        if map[x][y] == 1:
+        if bfs_map[x][y] == 1:
             jump_history[hash_xy(x, y)] = last_position
             return [[x, y], 1]
-        elif map[x][y] == 0:
-            map[x][y] = -1
+        elif bfs_map[x][y] == 0:
+            bfs_map[x][y] = -1
             queue.append([x, y])
             jump_history[hash_xy(x, y)] = last_position
         return [[], 0]
@@ -210,9 +273,25 @@ def get_operate(map, snake_head, path):
         return 'd'
     return wander(map, snake_head)
 
+def get_position(action, snake_head):
+    if action == 'w':
+        return [snake_head[0] - 1, snake_head[1]]
+    if action == 's':
+        return [snake_head[0] + 1, snake_head[1]]
+    if action == 'a':
+        return [snake_head[0], snake_head[1] - 1]
+    if action == 'd':
+        return [snake_head[0], snake_head[1] + 1]
+
+
+class Snake:
+    def __init__(self, body, speed):
+        self.body = body[:]
+        self.speed = speed
 
 # 这个函数只走一步，按照snake的speed数量进行多次调用
-def Policy(current_map, snake):
+def AStar_Policy(current_map, prop_snake):
+    user = os.getenv("user")
     global MAP_ROW
     MAP_ROW = current_map.row
     global MAP_COLUMN
@@ -220,34 +299,51 @@ def Policy(current_map, snake):
     global LEVEL
     LEVEL = current_map.level
     map = transfer_map(current_map.map)
-    print(map)
+    save_map = map.copy()
+    to_grow = prop_snake.toGrow
+    snake = Snake(prop_snake.body, prop_snake.speed)
     snake_head = snake.body[0].coordinates
     snake_tail = snake.body[len(snake.body) - 1].coordinates
-    # 如果速度大于长度，则wander
-    if snake.speed > len(snake.body):
-        return wander(map, snake_head)
-    # 在BFS过程中找到的第一个食物路径进行判断
-    # map = [[0, 1, 0], [0, 2, 0], [0, 2, 0]]
-    # snake_head = [2, 1]
-    # snake_tail = [2, 1]
-    food_path, food_flag = BFS(map, snake_head)
-    tail_flag = tailBFS(map, snake_head, snake_tail)
-    if food_flag == 1:
-        virtual_tail_flag = explore(map, food_path, snake)
-        if virtual_tail_flag:
-            print("蛇可以去吃食物")
-            if len(food_path) < 2:
-                return wander(map, snake_head)
-            print(get_operate(map, snake_head, food_path[1]))
-            return get_operate(map, snake_head, food_path[1])
-        else:
+    actions = ""
+    for _ in range(snake.speed):
+        # 在BFS过程中找到的第一个食物路径进行判断
+        food_path, food_flag = BFS(map, snake_head)
+        tail_flag = tailBFS(map, snake_head, snake_tail)
+        if food_flag == 1:
+            virtual_tail_flag = explore(map, food_path, snake)
+            if virtual_tail_flag:
+                if user == "徐珺涵":
+                    print("蛇可以去吃食物")
+                if len(food_path) < 2:
+                    action = wander(map, snake_head)
+                else:
+                    action = get_operate(map, snake_head, food_path[1])
+            else:
+                longest_direction = longest_tail_path(map, snake_head, snake_tail)
+                if user == "徐珺涵":
+                    print("蛇该去追尾巴")
+                action = get_operate(map, snake_head, longest_direction)
+        elif tail_flag:
+            if user == "徐珺涵":
+                print("找不到食物了，直接追尾巴")
             longest_direction = longest_tail_path(map, snake_head, snake_tail)
-            print("蛇该去追尾巴")
-            return get_operate(map, snake_head, longest_direction)
-    elif tail_flag:
-        print("找不到食物了，直接追尾巴")
-        longest_direction = longest_tail_path(map, snake_head, snake_tail)
-        return get_operate(map, snake_head, longest_direction)
-    else:
-        # 目前就是哪里不撞走哪里
-        return wander(map, snake_head)
+            action = get_operate(map, snake_head, longest_direction)
+        else:
+            # 目前就是哪里不撞走哪里
+            action = wander(map, snake_head)
+        # 更新蛇的身体&更新地图
+        snake.body.insert(0, Cube(get_position(action, snake_head)))
+        tmp = snake.body.pop().coordinates
+        if save_map[tmp[0]][tmp[1]] == 1:
+            if user == "徐珺涵":
+                print("提前溜耶")
+            break
+        actions += action
+        snake_head = snake.body[0].coordinates
+        snake_tail = snake.body[len(snake.body) - 1].coordinates
+        map[snake_head[0]][snake_head[1]] = 2
+        if to_grow == 0:
+            map[tmp[0]][tmp[1]] = 0
+        else:
+            to_grow -= 1
+    return actions
