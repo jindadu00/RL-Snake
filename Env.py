@@ -5,7 +5,7 @@ import pygame
 import sys
 from pygame.locals import *
 import time
-from AStarPolicy import Policy
+from Policy import Policy
 
 np.set_printoptions(threshold=np.inf)
 
@@ -652,9 +652,9 @@ if __name__ == "__main__":
         current_map.map[:, :, i] = 0
     # current_map.map[[1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 6],
     #                 [1, 2, 3, 4, 5, 6, 6, 6, 6, 6, 6], 9] = 1
-    current_map.map = np.load("filename.npy", allow_pickle=True)
-    render(current_map, snake_list[0])
-    input()
+    # current_map.map = np.load("filename.npy", allow_pickle=True)
+    # render(current_map, snake_list[0])
+    # input()
     while True:
         tmp = current_map.map.copy()
         resource_refresh(current_map)
@@ -668,7 +668,7 @@ if __name__ == "__main__":
             #     ac = Policy(current_map, snake)
             #     snake.move(ac, current_map)
             #     print(ac)
-            ac = Policy(current_map, snake)
+            ac = Policy(current_map, snake_list, 0)
             snake.move(ac, current_map)
         time.sleep(0.5)
         # print(current_map.map[:, :, 0], '\n\n')

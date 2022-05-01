@@ -23,38 +23,7 @@ class Cube:
         # TODO
         self.isHead = isHead
 
-# 0空地、1道具、2不可走
-def transfer_map(current_map):
-    map = np.zeros([MAP_ROW, MAP_COLUMN])
-    for i in range(MAP_ROW):
-        for j in range(MAP_COLUMN):
-            for k in range(LEVEL):
-                if current_map[i][j][k] == 1:
-                    if k in range(0, 6):
-                        map[i][j] = 2
-                        break
-                    if k in range(6, 10):
-                        map[i][j] = 1
-                    if k == 10:
-                        # 邻居也是墙
-                        if i - 1 >= 0:
-                            map[i - 1][j] = 2
-                        if i + 1 < MAP_ROW:
-                            map[i + 1][j] = 2
-                        if j - 1 >= 0:
-                            map[i][j - 1] = 2
-                        if j + 1 < MAP_COLUMN:
-                            map[i][j + 1] = 2
-                        # if i - 2 >= 0:
-                        #     map[i - 2][j] = 2
-                        # if i + 2 < MAP_ROW:
-                        #     map[i + 2][j] = 2
-                        # if j - 2 >= 0:
-                        #     map[i][j - 2] = 2
-                        # if j + 2 < MAP_COLUMN:
-                        #     map[i][j + 2] = 2
-                        map[i][j] = 2
-    return map
+
 
 dfs_level = 0
 arrive = False
@@ -289,16 +258,15 @@ class Snake:
         self.body = body[:]
         self.speed = speed
 
-# 这个函数只走一步，按照snake的speed数量进行多次调用
-def AStar_Policy(current_map, prop_snake):
+def AStar_Policy(map, prop_snake, row, column, level):
     user = os.getenv("user")
     global MAP_ROW
-    MAP_ROW = current_map.row
+    MAP_ROW = row
     global MAP_COLUMN
-    MAP_COLUMN = current_map.column
+    MAP_COLUMN = column
     global LEVEL
-    LEVEL = current_map.level
-    map = transfer_map(current_map.map)
+    LEVEL = level
+    # map = transfer_map(current_map.map)
     save_map = map.copy()
     to_grow = prop_snake.toGrow
     snake = Snake(prop_snake.body, prop_snake.speed)
@@ -342,6 +310,7 @@ def AStar_Policy(current_map, prop_snake):
         snake_head = snake.body[0].coordinates
         snake_tail = snake.body[len(snake.body) - 1].coordinates
         map[snake_head[0]][snake_head[1]] = 2
+        print(actions)
         if to_grow == 0:
             map[tmp[0]][tmp[1]] = 0
         else:
