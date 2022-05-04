@@ -15,7 +15,7 @@ import contest.snake_pb2 as dealer_pb2
 import contest.snake_pb2_grpc as rpc
 from lib.simple_logger import simple_logger
 import pickle
-from GameInfoAdaptor import my_policy
+from NewGameInfoAdaptor import my_policy
 
 
 def AI0(Num_, GameInfo_):

@@ -50,3 +50,15 @@ def SnakeConverter(game_info):
     for i in range(len(position)):
         my_snake.body.append(Cube(co_map(position[i])))
     return my_snake
+
+def SnakesConverter(game_info):
+    snake_list = []
+    for i in range(len(game_info)):
+        my_snake = Snake(i + 1, [], [], True)
+        position = game_info["Map"]["SnakePosition"][i]
+        my_snake.speed = game_info["Player"][i]["Speed"]
+        my_snake.body = []
+        for j in range(len(position)):
+            my_snake.body.append(Cube(co_map(position[j])))
+        snake_list.append(my_snake)
+    return snake_list

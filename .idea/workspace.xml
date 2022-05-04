@@ -2,11 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="aad483f7-9a83-42ac-ac84-e36786ba757b" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/LongestWay.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/NewGameInfoAdaptor.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ViolentSearchPolicy.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AStarPolicy.py" beforeDir="false" afterPath="$PROJECT_DIR$/AStarPolicy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Env.py" beforeDir="false" afterPath="$PROJECT_DIR$/Env.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Converter.py" beforeDir="false" afterPath="$PROJECT_DIR$/Converter.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Policy.py" beforeDir="false" afterPath="$PROJECT_DIR$/Policy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/filename.npy" beforeDir="false" afterPath="$PROJECT_DIR$/filename.npy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/client_example.py" beforeDir="false" afterPath="$PROJECT_DIR$/client_example.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,7 +34,9 @@
     </file-type-list>
   </component>
   <component name="ProjectId" id="27hXgsAUofBnvqjRU6ucDMcl1S6" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -44,7 +48,7 @@
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
-  <component name="RunManager" selected="Python.ENV">
+  <component name="RunManager" selected="Python.client">
     <configuration name="测试用例1" type="PythonConfigurationType" factoryName="Python">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
